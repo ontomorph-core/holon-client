@@ -1,4 +1,4 @@
-# @holon/client
+# @ontomorph/holon-client
 
 The official TypeScript client for the HOLON clinical-knowledge API, a
 normalized layer over SNOMED CT, RxNorm, LOINC, ICD, and more. One typed client
@@ -11,13 +11,13 @@ covers:
 - **Phenotype similarity:** score the overlap between two sets of phenotype terms.
 
 Runs on Node.js 18+, Bun, Deno, and any runtime with a global `fetch`. Fully
-typed, with one dependency: [`@holon/types`](https://www.npmjs.com/package/@holon/types).
+typed, with one dependency: [`@ontomorph/holon-types`](https://www.npmjs.com/package/@ontomorph/holon-types).
 
 ```bash
-npm install @holon/client
-# pnpm add @holon/client
-# yarn add @holon/client
-# bun add @holon/client
+npm install @ontomorph/holon-client
+# pnpm add @ontomorph/holon-client
+# yarn add @ontomorph/holon-client
+# bun add @ontomorph/holon-client
 ```
 
 ## Concepts
@@ -52,7 +52,7 @@ condition, when exact codes will not line up.
 ## Quick start
 
 ```ts
-import { createHolonClient } from "@holon/client";
+import { createHolonClient } from "@ontomorph/holon-client";
 
 const holon = createHolonClient({
   apiUrl: "https://holon.ontomorph.com",
@@ -142,11 +142,11 @@ const match = await holon.phenotype.match([9826, 4245975], [9826, 31967]);
 ## Error handling
 
 A non-2xx response (or a network or timeout failure) throws a `HolonError` from
-[`@holon/types`](https://www.npmjs.com/package/@holon/types), carrying a
+[`@ontomorph/holon-types`](https://www.npmjs.com/package/@ontomorph/holon-types), carrying a
 machine-readable `ErrorCode` and the raw response detail:
 
 ```ts
-import { HolonError, ErrorCode } from "@holon/types";
+import { HolonError, ErrorCode } from "@ontomorph/holon-types";
 
 try {
   await holon.concepts.getByCode("bogus", "RxNorm");
@@ -161,8 +161,8 @@ try {
 
 Common codes: `CONCEPT_NOT_FOUND`, `VOCABULARY_NOT_FOUND`, `NO_MAPPING_FOUND`,
 `INTERACTION_CHECK_FAILED`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMIT_EXCEEDED`,
-`VALIDATION_ERROR`. The full [`ErrorCode` enum](https://www.npmjs.com/package/@holon/types)
-lives in `@holon/types`.
+`VALIDATION_ERROR`. The full [`ErrorCode` enum](https://www.npmjs.com/package/@ontomorph/holon-types)
+lives in `@ontomorph/holon-types`.
 
 ## TypeScript
 
@@ -177,7 +177,7 @@ import type {
   MappingEntry,
   ReferenceRangeEntry,
   PhenotypeMatch,
-} from "@holon/client";
+} from "@ontomorph/holon-client";
 ```
 
 The lower-level `*Api` classes (`ConceptsApi`, `InteractionsApi`, `MappingsApi`,
@@ -186,8 +186,8 @@ a single namespace on its own.
 
 ## Related packages
 
-- [`@holon/types`](https://www.npmjs.com/package/@holon/types): shared enums (`ErrorCode`, `VocabularyId`, `DomainId`), error classes, and entity types. A peer of this client.
-- [`@dtp/sdk`](https://www.npmjs.com/package/@dtp/sdk): the DTP digital-twin SDK, which re-exports this client as `dtp.holon`.
+- [`@ontomorph/holon-types`](https://www.npmjs.com/package/@ontomorph/holon-types): shared enums (`ErrorCode`, `VocabularyId`, `DomainId`), error classes, and entity types. A peer of this client.
+- [`@ontomorph/dtp-sdk`](https://www.npmjs.com/package/@ontomorph/dtp-sdk): the DTP digital-twin SDK, which re-exports this client as `dtp.holon`.
 
 ## Documentation and support
 
