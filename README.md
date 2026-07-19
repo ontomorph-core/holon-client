@@ -1,17 +1,17 @@
 # @holon/client
 
-The official TypeScript client for the **HOLON clinical-knowledge API** — a
-normalized, cross-vocabulary layer over SNOMED CT, RxNorm, LOINC, ICD-10 and
-more. One typed client for:
+The official TypeScript client for the HOLON clinical-knowledge API, a
+normalized layer over SNOMED CT, RxNorm, LOINC, ICD, and more. One typed client
+covers:
 
-- **Concepts** — search, look up by code, and walk the concept hierarchy (ancestors / descendants).
-- **Drug interactions** — pairwise checks and whole-medication-list screening.
-- **Cross-vocabulary mappings** — translate a code from one vocabulary to another.
-- **Reference ranges** — age/sex-adjusted normal ranges for lab tests (by concept or LOINC code).
-- **Phenotype similarity** — score the overlap between two sets of phenotype terms.
+- **Concepts:** search, look up by code, and walk the concept hierarchy (ancestors and descendants).
+- **Drug interactions:** pairwise checks and whole-medication-list screening.
+- **Cross-vocabulary mappings:** translate a code from one vocabulary into another.
+- **Reference ranges:** age and sex adjusted normal ranges for lab tests, by concept or LOINC code.
+- **Phenotype similarity:** score the overlap between two sets of phenotype terms.
 
-Works in Node.js 18+, Bun, Deno, and any runtime with a global `fetch`. Fully
-typed; its only dependency is [`@holon/types`](https://www.npmjs.com/package/@holon/types).
+Runs on Node.js 18+, Bun, Deno, and any runtime with a global `fetch`. Fully
+typed, with one dependency: [`@holon/types`](https://www.npmjs.com/package/@holon/types).
 
 ```bash
 npm install @holon/client
@@ -19,6 +19,35 @@ npm install @holon/client
 # yarn add @holon/client
 # bun add @holon/client
 ```
+
+## Concepts
+
+The vocabulary this client speaks, and why each idea matters.
+
+**Concept.** A single clinical idea (a drug, a lab test, a diagnosis) with a
+stable numeric `conceptId` that stays the same no matter which coding system
+originally named it. Concepts are the anchor everything else hangs off.
+
+**Vocabulary.** A source coding system such as SNOMED CT, RxNorm, or LOINC. The
+same idea often has a different code in each. HOLON normalizes across them so
+you work with one concept instead of many codes.
+
+**Domain.** What kind of thing a concept is: a `Drug`, a `Measurement`, a
+`Condition`. Domains let you narrow a search to the category you mean.
+
+**Mapping, and translation.** A mapping links the same idea across two
+vocabularies. Translating a RxNorm code into its SNOMED equivalent is how you
+move a patient's data between systems that speak different codes.
+
+**Reference range.** The normal range for a lab test, narrowed by age and sex,
+so a value can be read as high, low, or in range for that specific patient.
+
+**Drug interaction.** A known, clinically significant effect between two drugs.
+The interactions API screens a pair or a whole medication list for them.
+
+**Phenotype similarity.** A score for how alike two sets of phenotype terms are.
+It is how you compare patients, or match a presentation to a candidate
+condition, when exact codes will not line up.
 
 ## Quick start
 
@@ -43,8 +72,8 @@ if (check.hasInteraction) {
 
 ## Authentication
 
-Every request is authenticated with a bearer API key, sent as
-`Authorization: Bearer <apiKey>`. Pass it once when you create the client:
+Every request carries a bearer API key, sent as `Authorization: Bearer <apiKey>`.
+Pass it once when you create the client:
 
 ```ts
 const holon = createHolonClient({ apiUrl, apiKey, timeout: 30_000 });
@@ -66,13 +95,13 @@ Request a key through the [developer dashboard](https://developer.ontomorph.com/
 
 ```ts
 await holon.concepts.getById("40213251");                 // ConceptResponse
-await holon.concepts.getByCode("197361", "RxNorm");       // by code + vocabulary
+await holon.concepts.getByCode("197361", "RxNorm");       // by code and vocabulary
 await holon.concepts.search("metformin", { domain: "Drug", page: 1, pageSize: 20 });
 await holon.concepts.getAncestors(40213251);              // hierarchy up
 await holon.concepts.getDescendants(40213251);            // hierarchy down
 ```
 
-`search` returns `{ hits, total, page, pageSize }`; each hit carries
+`search` returns `{ hits, total, page, pageSize }`. Each hit carries a
 `conceptId`, `conceptCode`, `conceptName`, `vocabularyId`, and `domainId`.
 
 ### `holon.interactions`
@@ -90,17 +119,17 @@ await holon.mappings.getByConceptId(40213251);            // all cross-vocab map
 await holon.mappings.translate("197361", "RxNorm", "SNOMED"); // → { source, target, mappings }
 ```
 
-`translate`'s third argument (target vocabulary) is optional — omit it to get
-mappings into every available vocabulary.
+The third argument to `translate` (the target vocabulary) is optional. Omit it
+to get mappings into every available vocabulary.
 
 ### `holon.referenceRanges`
 
 ```ts
 await holon.referenceRanges.getByConceptId(3004249);      // by HOLON concept id
-await holon.referenceRanges.getByLoincCode("2093-3", 45, "male"); // by LOINC, age/sex-adjusted
+await holon.referenceRanges.getByLoincCode("2093-3", 45, "male"); // by LOINC, age and sex adjusted
 ```
 
-`age` and `sex` are optional; supply them to get the range narrowed to that
+`age` and `sex` are optional. Supply them to narrow the range to that
 demographic.
 
 ### `holon.phenotype`
@@ -112,7 +141,7 @@ const match = await holon.phenotype.match([9826, 4245975], [9826, 31967]);
 
 ## Error handling
 
-Non-2xx responses (and network/timeout failures) throw a `HolonError` from
+A non-2xx response (or a network or timeout failure) throws a `HolonError` from
 [`@holon/types`](https://www.npmjs.com/package/@holon/types), carrying a
 machine-readable `ErrorCode` and the raw response detail:
 
@@ -132,7 +161,8 @@ try {
 
 Common codes: `CONCEPT_NOT_FOUND`, `VOCABULARY_NOT_FOUND`, `NO_MAPPING_FOUND`,
 `INTERACTION_CHECK_FAILED`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMIT_EXCEEDED`,
-`VALIDATION_ERROR`. See the full [`ErrorCode` enum](https://www.npmjs.com/package/@holon/types).
+`VALIDATION_ERROR`. The full [`ErrorCode` enum](https://www.npmjs.com/package/@holon/types)
+lives in `@holon/types`.
 
 ## TypeScript
 
@@ -151,15 +181,15 @@ import type {
 ```
 
 The lower-level `*Api` classes (`ConceptsApi`, `InteractionsApi`, `MappingsApi`,
-`ReferenceRangesApi`, `PhenotypeApi`) are also exported if you want to construct
-a single namespace directly.
+`ReferenceRangesApi`, `PhenotypeApi`) are exported too, if you want to construct
+a single namespace on its own.
 
 ## Related packages
 
-- [`@holon/types`](https://www.npmjs.com/package/@holon/types) — shared enums (`ErrorCode`, `VocabularyId`, `DomainId`), error classes, and entity types. A peer of this client.
-- [`@dtp/sdk`](https://www.npmjs.com/package/@dtp/sdk) — the DTP digital-twin SDK, which re-exports this client as `dtp.holon`.
+- [`@holon/types`](https://www.npmjs.com/package/@holon/types): shared enums (`ErrorCode`, `VocabularyId`, `DomainId`), error classes, and entity types. A peer of this client.
+- [`@dtp/sdk`](https://www.npmjs.com/package/@dtp/sdk): the DTP digital-twin SDK, which re-exports this client as `dtp.holon`.
 
-## Documentation & support
+## Documentation and support
 
 - Developer docs: <https://developer.ontomorph.com/docs>
 - API reference: <https://developer.ontomorph.com/api-reference>
@@ -167,4 +197,4 @@ a single namespace directly.
 
 ## License
 
-UNLICENSED — © OntoMorph. Usage governed by your OntoMorph platform agreement.
+UNLICENSED. © OntoMorph. Usage is governed by your OntoMorph platform agreement.
