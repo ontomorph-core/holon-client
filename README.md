@@ -13,6 +13,8 @@ covers:
 Runs on Node.js 18+, Bun, Deno, and any runtime with a global `fetch`. Fully
 typed, with one dependency: [`@ontomorph/holon-types`](https://www.npmjs.com/package/@ontomorph/holon-types).
 
+> **The [wiki](https://github.com/ontomorph-core/holon-client/wiki) has the full guide:** getting started, concepts, guides, use cases, API reference, and FAQ.
+
 ```bash
 npm install @ontomorph/holon-client
 # pnpm add @ontomorph/holon-client
