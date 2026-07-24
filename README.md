@@ -57,7 +57,7 @@ condition, when exact codes will not line up.
 import { createHolonClient } from "@ontomorph/holon-client";
 
 const holon = createHolonClient({
-  apiUrl: "https://holon.ontomorph.com",
+  apiUrl: "https://holon-api.ontomorph.com",
   apiKey: process.env.HOLON_API_KEY, // holon_…
 });
 
@@ -83,7 +83,7 @@ const holon = createHolonClient({ apiUrl, apiKey, timeout: 30_000 });
 
 | Option | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `apiUrl` | `string` | yes | HOLON API base URL, e.g. `https://holon.ontomorph.com` |
+| `apiUrl` | `string` | yes | HOLON API base URL, e.g. `https://holon-api.ontomorph.com` |
 | `apiKey` | `string` | yes | Your `holon_…` key, sent as a bearer token |
 | `timeout` | `number` | no | Per-request timeout in ms (via `AbortSignal.timeout`) |
 
